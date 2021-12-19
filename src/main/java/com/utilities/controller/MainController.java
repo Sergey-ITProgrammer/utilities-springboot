@@ -16,18 +16,14 @@ import java.util.Set;
 @RestController
 @RequestMapping("/utilities")
 public class MainController {
-    ScannedObject pathScannedObject = new ScannedObject();
-
     ScavengerService scavengerService = new ScavengerService();
     AnalyzerService analyzerService = new AnalyzerService();
 
     private List<Path> listOfFiles;
 
     @PostMapping("")
-    public void setPathAndFindAllFiles(@RequestBody String path) {
-        pathScannedObject.setPath(path);
-
-        listOfFiles = scavengerService.findAll(pathScannedObject.getPath());
+    public void setPathAndFindAllFiles(@RequestBody ScannedObject object) {
+        listOfFiles = scavengerService.findAll(object.getPath());
     }
 
     @GetMapping("")
