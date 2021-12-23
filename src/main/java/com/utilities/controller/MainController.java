@@ -5,6 +5,7 @@ import com.utilities.domain.ScannedObject;
 import com.utilities.repository.CommonRepository;
 import com.utilities.service.AnalyzerService;
 import com.utilities.service.ScavengerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -21,61 +22,78 @@ public class MainController {
         this.repository = repository;
     }
 
+    private List<Path> listOfFiles = new ArrayList<>();
+    private List<Path> listOfBiggestFiles = new ArrayList<>();
+    private Set<Path> listOfDuplicates = new LinkedHashSet<>();
+    private Map<Path, String> listOfUnknownFiles = new LinkedHashMap<>();
+
+    @Autowired
+    AnalyzerService analyzerService;
+
     @PostMapping("")
     public void createScannedObject(@RequestBody ScannedObject object) {
-        System.out.println(object.getPath());
-        System.out.println(object.getId());
-
         repository.save(object);
+    }
+
+    @PutMapping("")
+    public void changeScannedObject(@RequestBody ScannedObject object) {
+        ScannedObject existingScannedObject = repository.findById(object.getId());
+
+        existingScannedObject.setPath(object.getPath());
+    }
+
+    @DeleteMapping("")
+    public void deleteScannedObject(@RequestBody ScannedObject object) {
+        repository.delete(object.getId());
+
+        listOfFiles = Collections.emptyList();
+        listOfBiggestFiles = Collections.emptyList();
+        listOfDuplicates = Collections.emptySet();
+        listOfUnknownFiles = Collections.emptyMap();
     }
 
     @GetMapping("/{id}")
     public List<Path> getAllFiles(@PathVariable String id) {
+        if (!listOfFiles.isEmpty()) {
+            listOfFiles = Collections.emptyList();
+            listOfBiggestFiles = Collections.emptyList();
+            listOfDuplicates = Collections.emptySet();
+            listOfUnknownFiles = Collections.emptyMap();
+        }
+
         ScavengerService scavengerService = new ScavengerService();
 
-        List<Path> listOfFiles;
-
-        listOfFiles = scavengerService.findAll(repository.findById(id).getPath());
+        if (listOfFiles.isEmpty()) {
+            listOfFiles = scavengerService.findAll(repository.findById(id).getPath());
+        }
 
         return listOfFiles;
     }
 
-    @GetMapping("/{id}/biggestfiles")
-    public List<Path> getBiggestFiles(@PathVariable String id) {
-        AnalyzerService analyzerService = new AnalyzerService();
+    @GetMapping("/{id}/biggestfiles/{amountOfFiles}")
+    public List<Path> getBiggestFiles(@PathVariable String id, @PathVariable int amountOfFiles) {
+        if (listOfBiggestFiles.isEmpty()) {
+            listOfBiggestFiles = analyzerService.getBiggestFiles(listOfFiles, amountOfFiles);
+        }
 
-        ScavengerService scavengerService = new ScavengerService();
-
-        List<Path> listOfFiles;
-
-        listOfFiles = scavengerService.findAll(repository.findById(id).getPath());
-
-        return analyzerService.getBiggestFiles(listOfFiles, 10);
+        return listOfBiggestFiles;
     }
 
-    @GetMapping("/{id}/dublicates")
+    @GetMapping("/{id}/duplicates")
     public Set<Path> getDuplicates(@PathVariable String id) throws NoSuchAlgorithmException, IOException {
-        AnalyzerService analyzerService = new AnalyzerService();
+        if (listOfDuplicates.isEmpty()) {
+            listOfDuplicates = analyzerService.getDuplicates(listOfFiles);
+        }
 
-        ScavengerService scavengerService = new ScavengerService();
-
-        List<Path> listOfFiles;
-
-        listOfFiles = scavengerService.findAll(repository.findById(id).getPath());
-
-        return analyzerService.getDuplicates(listOfFiles);
+        return listOfDuplicates;
     }
 
     @GetMapping("/{id}/unknownfiles")
     public Map<Path, String> getUnknownFiles(@PathVariable String id) throws NoSuchAlgorithmException, IOException {
-        AnalyzerService analyzerService = new AnalyzerService();
+        if (listOfUnknownFiles.isEmpty()) {
+            listOfUnknownFiles = analyzerService.getUnknownFiles(listOfFiles);
+        }
 
-        ScavengerService scavengerService = new ScavengerService();
-
-        List<Path> listOfFiles;
-
-        listOfFiles = scavengerService.findAll(repository.findById(id).getPath());
-
-        return analyzerService.getUnknownFiles(listOfFiles);
+        return listOfUnknownFiles;
     }
 }

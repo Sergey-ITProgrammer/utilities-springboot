@@ -19,8 +19,8 @@ public class ScannedObjectRepositoryImpl implements CommonRepository<ScannedObje
     }
 
     @Override
-    public void delete(ScannedObject domain) {
-
+    public void delete(String id) {
+        scannedObjects.remove(id);
     }
 
     @Override

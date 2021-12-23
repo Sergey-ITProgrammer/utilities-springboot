@@ -1,6 +1,8 @@
 package com.utilities.service;
 
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,7 +11,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-@Service
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class AnalyzerService {
 
     public List<Path> getBiggestFiles(List<Path> files, int amountOfFiles) {
@@ -30,6 +33,7 @@ public class AnalyzerService {
 
         return list;
     }
+
 
     public Set<Path> getDuplicates(List<Path> files) throws NoSuchAlgorithmException, IOException {
         LinkedHashSet<Path> list = new LinkedHashSet<>();

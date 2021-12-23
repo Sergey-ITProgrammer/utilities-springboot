@@ -1,16 +1,21 @@
 package com.utilities.service;
 
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
-@Service
+@Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ScavengerService {
     final private List<Path> list = new ArrayList<>();
 
     public List<Path> findAll(String path) {
+        if (!list.isEmpty()) return list;
+
         File dir = new File(String.valueOf(path));
 
         searchFiles(dir);
