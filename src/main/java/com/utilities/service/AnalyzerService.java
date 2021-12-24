@@ -389,28 +389,4 @@ public class AnalyzerService {
     public void cleanListOfUnknownFiles() {
         listOfUnknownFiles = new LinkedHashMap<>();
     }
-
-    public boolean isListOfBiggestFilesEmpty() {
-        return listOfBiggestFiles.isEmpty();
-    }
-
-    public boolean isListOfDuplicatesEmpty() {
-        return listOfDuplicates.isEmpty();
-    }
-
-    public boolean isListOfUnknownFilesEmpty() {
-        return listOfUnknownFiles.isEmpty();
-    }
-
-    public List<Path> getListOfBiggestFiles() {
-        return listOfBiggestFiles;
-    }
-
-    public Set<Path> getListOfDuplicates() {
-        return listOfDuplicates;
-    }
-
-    public Map<Path, String> getListOfUnknownFiles() {
-        return listOfUnknownFiles;
-    }
 }

@@ -38,8 +38,4 @@ public class ScavengerService {
     public void cleanList() {
         list = new ArrayList<>();
     }
-
-    public boolean isEmpty() {
-        return list.isEmpty();
-    }
 }
