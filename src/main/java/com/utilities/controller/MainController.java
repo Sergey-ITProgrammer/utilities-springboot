@@ -47,8 +47,8 @@ public class MainController {
     public void changeScannedObject(@RequestBody ScannedObject object) {
         scavengerService.cleanList();
 
-        repositoryOfScannedObjects.setValue(object, object.getId());
-        repositoryOfListsOfAllFiles.setValue(scavengerService.findAll(object.getPath()), object.getId());
+        repositoryOfScannedObjects.setNewValue(object, object.getId());
+        repositoryOfListsOfAllFiles.setNewValue(scavengerService.findAll(object.getPath()), object.getId());
     }
 
     @DeleteMapping("")

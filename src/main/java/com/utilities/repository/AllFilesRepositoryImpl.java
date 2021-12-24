@@ -27,7 +27,7 @@ public class AllFilesRepositoryImpl implements CommonRepository<List<Path>> {
     }
 
     @Override
-    public void setValue(List<Path> value, String id) {
+    public void setNewValue(List<Path> value, String id) {
         listsOfAllFiles.replace(id, value);
     }
 }

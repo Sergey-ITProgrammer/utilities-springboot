@@ -4,5 +4,5 @@ public interface CommonRepository<T> {
     void save(T domain, String id);
     void delete(String id);
     T findById(String id);
-    void setValue(T value, String id);
+    void setNewValue(T value, String id);
 }

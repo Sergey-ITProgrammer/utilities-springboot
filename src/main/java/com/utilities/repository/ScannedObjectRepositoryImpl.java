@@ -26,7 +26,7 @@ public class ScannedObjectRepositoryImpl implements CommonRepository<ScannedObje
     }
 
     @Override
-    public void setValue(ScannedObject value, String id) {
+    public void setNewValue(ScannedObject value, String id) {
         scannedObjects.replace(id, value);
     }
 }
