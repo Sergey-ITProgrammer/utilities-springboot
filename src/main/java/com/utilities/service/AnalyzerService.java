@@ -14,11 +14,12 @@ import java.util.*;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class AnalyzerService {
+    private List<Path> listOfBiggestFiles = new ArrayList<>();
+    private Set<Path> listOfDuplicates = new LinkedHashSet<>();
+    private Map<Path, String> listOfUnknownFiles = new LinkedHashMap<>();
 
     public List<Path> getBiggestFiles(List<Path> files, int amountOfFiles) {
         if(files.isEmpty() || amountOfFiles > files.size()) return new ArrayList<>();
-
-        List<Path> list = new ArrayList<>();
 
         List<File> ls = new ArrayList<>();
         for (Path item : files) {
@@ -28,15 +29,14 @@ public class AnalyzerService {
         ls.sort((a, b) -> (int) (a.length() - b.length()));
 
         for (int i = files.size() - amountOfFiles; i < files.size(); i++) {
-            list.add(ls.get(i).toPath());
+            listOfBiggestFiles.add(ls.get(i).toPath());
         }
 
-        return list;
+        return listOfBiggestFiles;
     }
 
 
     public Set<Path> getDuplicates(List<Path> files) throws NoSuchAlgorithmException, IOException {
-        LinkedHashSet<Path> list = new LinkedHashSet<>();
         byte[][] digest = new byte[files.size()][];
 
         for (int i = 0; i < files.size(); i++) {
@@ -50,16 +50,14 @@ public class AnalyzerService {
                 if(i == j) continue;
 
                 if (Arrays.equals(digest[i], digest[j])) {
-                    list.add(files.get(i));
+                    listOfDuplicates.add(files.get(i));
                 }
             }
         }
-        return list;
+        return listOfDuplicates;
     }
 
     public Map<Path, String> getUnknownFiles(List<Path> files) throws NoSuchAlgorithmException, IOException {
-        LinkedHashMap<Path, String> listOfUnknownFiles = new LinkedHashMap<>();
-
         LinkedHashMap<String, String> listOfFileSignature = new LinkedHashMap<>();
 
         List<String> fileOfSignatures = getListOfSignatures();
@@ -378,5 +376,41 @@ public class AnalyzerService {
                 "21 2D 31 53 4C 4F 42 1F; slob";
 
         return Arrays.asList(list.split("\n"));
+    }
+
+    public void cleanListOfBiggestFiles() {
+        listOfBiggestFiles = new ArrayList<>();
+    }
+
+    public void cleanListOfDuplicates() {
+        listOfDuplicates = new LinkedHashSet<>();
+    }
+
+    public void cleanListOfUnknownFiles() {
+        listOfUnknownFiles = new LinkedHashMap<>();
+    }
+
+    public boolean isListOfBiggestFilesEmpty() {
+        return listOfBiggestFiles.isEmpty();
+    }
+
+    public boolean isListOfDuplicatesEmpty() {
+        return listOfDuplicates.isEmpty();
+    }
+
+    public boolean isListOfUnknownFilesEmpty() {
+        return listOfUnknownFiles.isEmpty();
+    }
+
+    public List<Path> getListOfBiggestFiles() {
+        return listOfBiggestFiles;
+    }
+
+    public Set<Path> getListOfDuplicates() {
+        return listOfDuplicates;
+    }
+
+    public Map<Path, String> getListOfUnknownFiles() {
+        return listOfUnknownFiles;
     }
 }

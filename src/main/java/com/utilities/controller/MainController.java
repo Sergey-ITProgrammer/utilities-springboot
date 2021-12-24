@@ -2,7 +2,9 @@ package com.utilities.controller;
 
 
 import com.utilities.domain.ScannedObject;
+import com.utilities.repository.AllFilesRepositoryImpl;
 import com.utilities.repository.CommonRepository;
+import com.utilities.repository.ScannedObjectRepositoryImpl;
 import com.utilities.service.AnalyzerService;
 import com.utilities.service.ScavengerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,84 +18,68 @@ import java.util.*;
 @RestController
 @RequestMapping("/utilities")
 public class MainController {
-    private final CommonRepository<ScannedObject> repository;
+    private final CommonRepository<ScannedObject> repositoryOfScannedObjects;
+    private final CommonRepository<List<Path>> repositoryOfListsOfAllFiles;
 
-    public MainController(CommonRepository<ScannedObject> repository) {
-        this.repository = repository;
+    public MainController(ScannedObjectRepositoryImpl repositoryOfScannedObjects, AllFilesRepositoryImpl repositoryOfListsOfAllFiles) {
+        this.repositoryOfScannedObjects = repositoryOfScannedObjects;
+        this.repositoryOfListsOfAllFiles = repositoryOfListsOfAllFiles;
     }
-
-    private List<Path> listOfFiles = new ArrayList<>();
-    private List<Path> listOfBiggestFiles = new ArrayList<>();
-    private Set<Path> listOfDuplicates = new LinkedHashSet<>();
-    private Map<Path, String> listOfUnknownFiles = new LinkedHashMap<>();
 
     @Autowired
     AnalyzerService analyzerService;
 
+    @Autowired
+    ScavengerService scavengerService;
+
     @PostMapping("")
     public void createScannedObject(@RequestBody ScannedObject object) {
-        repository.save(object);
+        System.out.println(object.getPath());
+        System.out.println(object.getId());
+
+        scavengerService.cleanList();
+
+        repositoryOfScannedObjects.save(object, object.getId());
+        repositoryOfListsOfAllFiles.save(scavengerService.findAll(object.getPath()), object.getId());
     }
 
     @PutMapping("")
     public void changeScannedObject(@RequestBody ScannedObject object) {
-        ScannedObject existingScannedObject = repository.findById(object.getId());
+        scavengerService.cleanList();
 
-        existingScannedObject.setPath(object.getPath());
+        repositoryOfScannedObjects.setValue(object, object.getId());
+        repositoryOfListsOfAllFiles.setValue(scavengerService.findAll(object.getPath()), object.getId());
     }
 
     @DeleteMapping("")
     public void deleteScannedObject(@RequestBody ScannedObject object) {
-        repository.delete(object.getId());
-
-        listOfFiles = Collections.emptyList();
-        listOfBiggestFiles = Collections.emptyList();
-        listOfDuplicates = Collections.emptySet();
-        listOfUnknownFiles = Collections.emptyMap();
+        repositoryOfScannedObjects.delete(object.getId());
+        repositoryOfListsOfAllFiles.delete(object.getId());
     }
 
     @GetMapping("/{id}")
     public List<Path> getAllFiles(@PathVariable String id) {
-        if (!listOfFiles.isEmpty()) {
-            listOfFiles = Collections.emptyList();
-            listOfBiggestFiles = Collections.emptyList();
-            listOfDuplicates = Collections.emptySet();
-            listOfUnknownFiles = Collections.emptyMap();
-        }
-
-        ScavengerService scavengerService = new ScavengerService();
-
-        if (listOfFiles.isEmpty()) {
-            listOfFiles = scavengerService.findAll(repository.findById(id).getPath());
-        }
-
-        return listOfFiles;
+        return repositoryOfListsOfAllFiles.findById(id);
     }
 
     @GetMapping("/{id}/biggestfiles/{amountOfFiles}")
     public List<Path> getBiggestFiles(@PathVariable String id, @PathVariable int amountOfFiles) {
-        if (listOfBiggestFiles.isEmpty()) {
-            listOfBiggestFiles = analyzerService.getBiggestFiles(listOfFiles, amountOfFiles);
-        }
+        analyzerService.cleanListOfBiggestFiles();
 
-        return listOfBiggestFiles;
+        return analyzerService.getBiggestFiles(repositoryOfListsOfAllFiles.findById(id), amountOfFiles);
     }
 
     @GetMapping("/{id}/duplicates")
     public Set<Path> getDuplicates(@PathVariable String id) throws NoSuchAlgorithmException, IOException {
-        if (listOfDuplicates.isEmpty()) {
-            listOfDuplicates = analyzerService.getDuplicates(listOfFiles);
-        }
+        analyzerService.cleanListOfDuplicates();
 
-        return listOfDuplicates;
+        return analyzerService.getDuplicates(repositoryOfListsOfAllFiles.findById(id));
     }
 
     @GetMapping("/{id}/unknownfiles")
     public Map<Path, String> getUnknownFiles(@PathVariable String id) throws NoSuchAlgorithmException, IOException {
-        if (listOfUnknownFiles.isEmpty()) {
-            listOfUnknownFiles = analyzerService.getUnknownFiles(listOfFiles);
-        }
+        analyzerService.cleanListOfUnknownFiles();
 
-        return listOfUnknownFiles;
+        return analyzerService.getUnknownFiles(repositoryOfListsOfAllFiles.findById(id));
     }
 }

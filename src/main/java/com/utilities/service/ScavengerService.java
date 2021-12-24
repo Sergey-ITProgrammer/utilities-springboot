@@ -11,7 +11,7 @@ import java.util.*;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ScavengerService {
-    final private List<Path> list = new ArrayList<>();
+    private List<Path> list = new ArrayList<>();
 
     public List<Path> findAll(String path) {
         if (!list.isEmpty()) return list;
@@ -33,5 +33,13 @@ public class ScavengerService {
                 }
             }
         }
+    }
+
+    public void cleanList() {
+        list = new ArrayList<>();
+    }
+
+    public boolean isEmpty() {
+        return list.isEmpty();
     }
 }
