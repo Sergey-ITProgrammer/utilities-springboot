@@ -21,9 +21,6 @@ public class UtilitiesController {
 
     @PostMapping("")
     public void createScannedObject(@RequestBody ScannedObject object) {
-        System.out.println(object.getPath());
-        System.out.println(object.getId());
-
         utilitiesService.createScannedObject(object);
     }
 
