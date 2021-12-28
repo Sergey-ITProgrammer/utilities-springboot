@@ -11,6 +11,12 @@ import java.util.Map;
 public class AllFilesRepositoryImpl implements CommonRepository<List<Path>> {
     private final Map<String, List<Path>> listsOfAllFiles = new LinkedHashMap<>();
 
+
+    @Override
+    public Map<String, List<Path>> getAll() {
+        return listsOfAllFiles;
+    }
+
     @Override
     public void save(List<Path> list, String id) {
         listsOfAllFiles.put(id, list);
@@ -27,7 +33,7 @@ public class AllFilesRepositoryImpl implements CommonRepository<List<Path>> {
     }
 
     @Override
-    public void setNewValue(List<Path> value, String id) {
+    public void setNewValue(String id, List<Path> value) {
         listsOfAllFiles.replace(id, value);
     }
 }

@@ -11,6 +11,11 @@ public class ScannedObjectRepositoryImpl implements CommonRepository<ScannedObje
     private final Map<String, ScannedObject> scannedObjects = new HashMap<>();
 
     @Override
+    public Map<String, ScannedObject> getAll() {
+        return scannedObjects;
+    }
+
+    @Override
     public void save(ScannedObject domain, String id) {
         scannedObjects.put(id, domain);
     }
@@ -26,7 +31,7 @@ public class ScannedObjectRepositoryImpl implements CommonRepository<ScannedObje
     }
 
     @Override
-    public void setNewValue(ScannedObject value, String id) {
-        scannedObjects.replace(id, value);
+    public void setNewValue(String id, ScannedObject newObject) {
+        scannedObjects.replace(id, newObject);
     }
 }
