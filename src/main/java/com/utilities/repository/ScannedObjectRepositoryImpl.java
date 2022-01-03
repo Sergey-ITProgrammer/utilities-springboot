@@ -3,12 +3,12 @@ package com.utilities.repository;
 import com.utilities.domain.ScannedObject;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Repository
 public class ScannedObjectRepositoryImpl implements CommonRepository<ScannedObject>{
-    private final Map<String, ScannedObject> scannedObjects = new HashMap<>();
+    private final Map<String, ScannedObject> scannedObjects = new LinkedHashMap<>();
 
     @Override
     public Map<String, ScannedObject> getAll() {

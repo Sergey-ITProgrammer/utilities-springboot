@@ -1,4 +1,4 @@
-package com.utilities.service;
+package com.utilities.scan.service;
 
 import com.utilities.domain.ScannedObject;
 import com.utilities.repository.AllFilesRepositoryImpl;
@@ -7,28 +7,22 @@ import com.utilities.repository.ScannedObjectRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
-public class UtilitiesService {
+public class ScanService {
     private final CommonRepository<ScannedObject> repositoryOfScannedObjects;
     private final CommonRepository<List<Path>> repositoryOfListsOfAllFiles;
 
-    public UtilitiesService(ScannedObjectRepositoryImpl repositoryOfScannedObjects, AllFilesRepositoryImpl repositoryOfListsOfAllFiles) {
+    public ScanService(ScannedObjectRepositoryImpl repositoryOfScannedObjects, AllFilesRepositoryImpl repositoryOfListsOfAllFiles) {
         this.repositoryOfScannedObjects = repositoryOfScannedObjects;
         this.repositoryOfListsOfAllFiles = repositoryOfListsOfAllFiles;
     }
 
     @Autowired
-    AnalyzerService analyzerService;
-
-    @Autowired
-    ScavengerService scavengerService;
+    ScavengerServiceImpl scavengerService;
 
     public void createScannedObject(ScannedObject object) {
         scavengerService.cleanList();
@@ -58,23 +52,5 @@ public class UtilitiesService {
 
     public List<Path> getAllFiles(String id) {
         return repositoryOfListsOfAllFiles.findById(id);
-    }
-
-    public List<Path> getBiggestFiles(String id, int amountOfFiles) {
-        analyzerService.cleanListOfBiggestFiles();
-
-        return analyzerService.getBiggestFiles(repositoryOfListsOfAllFiles.findById(id), amountOfFiles);
-    }
-
-    public Set<Path> getDuplicates(String id) throws NoSuchAlgorithmException, IOException {
-        analyzerService.cleanListOfDuplicates();
-
-        return analyzerService.getDuplicates(repositoryOfListsOfAllFiles.findById(id));
-    }
-
-    public Map<Path, String> getUnknownFiles(String id) throws NoSuchAlgorithmException, IOException {
-        analyzerService.cleanListOfUnknownFiles();
-
-        return analyzerService.getUnknownFiles(repositoryOfListsOfAllFiles.findById(id));
     }
 }

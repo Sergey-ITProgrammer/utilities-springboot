@@ -1,4 +1,4 @@
-package com.utilities.service;
+package com.utilities.scan.service;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -10,9 +10,11 @@ import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class ScavengerService {
+public class ScavengerServiceImpl implements ScavengerService {
+
     private List<Path> list = new ArrayList<>();
 
+    @Override
     public List<Path> findAll(String path) {
         if (!list.isEmpty()) return list;
 

@@ -1,4 +1,4 @@
-package com.utilities.service;
+package com.utilities.analysis.service;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -13,11 +13,13 @@ import java.util.*;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class AnalyzerService {
+public class AnalyzerServiceImpl implements AnalyzerService {
+
     private List<Path> listOfBiggestFiles = new ArrayList<>();
     private Set<Path> listOfDuplicates = new LinkedHashSet<>();
     private Map<Path, String> listOfUnknownFiles = new LinkedHashMap<>();
 
+    @Override
     public List<Path> getBiggestFiles(List<Path> files, int amountOfFiles) {
         if(files.isEmpty() || amountOfFiles > files.size()) return new ArrayList<>();
 
@@ -35,7 +37,7 @@ public class AnalyzerService {
         return listOfBiggestFiles;
     }
 
-
+    @Override
     public Set<Path> getDuplicates(List<Path> files) throws NoSuchAlgorithmException, IOException {
         byte[][] digest = new byte[files.size()][];
 
@@ -57,6 +59,7 @@ public class AnalyzerService {
         return listOfDuplicates;
     }
 
+    @Override
     public Map<Path, String> getUnknownFiles(List<Path> files) throws NoSuchAlgorithmException, IOException {
         LinkedHashMap<String, String> listOfFileSignature = new LinkedHashMap<>();
 
