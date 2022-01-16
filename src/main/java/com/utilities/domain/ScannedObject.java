@@ -7,6 +7,7 @@ import java.util.UUID;
 public class ScannedObject {
     @NonNull
     private String path;
+
     private String id;
 
     public ScannedObject() {

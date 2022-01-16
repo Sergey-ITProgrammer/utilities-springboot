@@ -34,22 +34,22 @@ public class ScanController {
 
     @PutMapping("")
     public ResponseEntity<?> changeScannedObject(@RequestParam(value = "id") String id, @RequestParam(value = "path") String path) {
-        scanService.changeScannedObject(id, path);
-
         if (id.isEmpty() || path.isEmpty()) {
-            return new ResponseEntity<>("Id or path are empty!", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("Id or path is empty!", HttpStatus.NO_CONTENT);
         }
+
+        scanService.changeScannedObject(id, path);
 
         return ResponseEntity.ok("The scanned object has been changed successfully\n");
     }
 
     @DeleteMapping("")
     public ResponseEntity<String> deleteScannedObject(@RequestParam String id) {
-        scanService.deleteScannedObject(id);
-
         if (id.isEmpty()) {
             return new ResponseEntity<>("Id is empty!", HttpStatus.NO_CONTENT);
         }
+
+        scanService.deleteScannedObject(id);
 
         return ResponseEntity.ok("The scanned object has been deleted successfully\n");
     }
