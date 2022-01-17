@@ -1,56 +1,62 @@
 package com.utilities.scan.service;
 
 import com.utilities.domain.ScannedObject;
-import com.utilities.repository.AllFilesRepositoryImpl;
-import com.utilities.repository.CommonRepository;
-import com.utilities.repository.ScannedObjectRepositoryImpl;
+import com.utilities.repository.RepositoryOfScannedObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ScanService {
-    private final CommonRepository<ScannedObject> repositoryOfScannedObjects;
-    private final CommonRepository<List<Path>> repositoryOfListsOfAllFiles;
-
-    public ScanService(ScannedObjectRepositoryImpl repositoryOfScannedObjects, AllFilesRepositoryImpl repositoryOfListsOfAllFiles) {
-        this.repositoryOfScannedObjects = repositoryOfScannedObjects;
-        this.repositoryOfListsOfAllFiles = repositoryOfListsOfAllFiles;
-    }
 
     @Autowired
-    ScavengerServiceImpl scavengerService;
+    private RepositoryOfScannedObject repositoryOfScannedObjects;
+
+    @Autowired
+    private ScavengerServiceImpl scavengerService;
 
     public void createScannedObject(ScannedObject object) {
         scavengerService.cleanList();
 
-        repositoryOfScannedObjects.save(object, object.getId());
-        repositoryOfListsOfAllFiles.save(scavengerService.findAll(object.getPath()), object.getId());
+        repositoryOfScannedObjects.save(object);
     }
 
-    public void changeScannedObject(String id, String newPath) {
+    public ScannedObject changeScannedObject(long id, String newPath) {
         scavengerService.cleanList();
 
-        ScannedObject newObject = repositoryOfScannedObjects.findById(id);
-        newObject.setPath(newPath);
+        Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
 
-        repositoryOfScannedObjects.setNewValue(id, newObject);
-        repositoryOfListsOfAllFiles.setNewValue(id, scavengerService.findAll(newPath));
+        if (scannedObject.isPresent()) {
+            scannedObject.get().setPath(newPath);
+
+            repositoryOfScannedObjects.save(scannedObject.get());
+
+            return scannedObject.get();
+        }
+
+        return null;
     }
 
-    public void deleteScannedObject(String id) {
-        repositoryOfScannedObjects.delete(id);
-        repositoryOfListsOfAllFiles.delete(id);
+    public void deleteScannedObject(long id) {
+        Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
+
+        scannedObject.ifPresent(repositoryOfScannedObjects::delete);
     }
 
-    public Map<String, ScannedObject> getAllScannedObjects() {
-        return repositoryOfScannedObjects.getAll();
+    public Iterable<ScannedObject> getAllScannedObjects() {
+        return repositoryOfScannedObjects.findAll();
     }
 
-    public List<Path> getAllFiles(String id) {
-        return repositoryOfListsOfAllFiles.findById(id);
+    public List<Path> getAllFiles(long id) {
+        Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
+
+        if(scannedObject.isPresent()) {
+            return scavengerService.findAll(scannedObject.get().getPath());
+        }
+
+        return null;
     }
 }

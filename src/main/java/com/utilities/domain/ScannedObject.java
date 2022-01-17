@@ -2,16 +2,26 @@ package com.utilities.domain;
 
 import org.springframework.lang.NonNull;
 
-import java.util.UUID;
+import javax.persistence.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
 public class ScannedObject {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    @Column(name = "path")
     @NonNull
-    private String path;
+    private String path = "";
 
-    private String id;
+    public ScannedObject() {}
 
-    public ScannedObject() {
-        this.id = UUID.randomUUID().toString();
+    public Long getId() {
+        return id;
     }
 
     public String getPath() {
@@ -20,9 +30,5 @@ public class ScannedObject {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getId() {
-        return id;
     }
 }

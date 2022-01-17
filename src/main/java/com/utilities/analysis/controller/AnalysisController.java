@@ -2,6 +2,7 @@ package com.utilities.analysis.controller;
 
 
 import com.utilities.analysis.service.AnalysisService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,40 +17,38 @@ import java.util.Set;
 @RestController
 @RequestMapping("/utilities/analysis")
 public class AnalysisController {
-    private final AnalysisService analysisService;
 
-    public AnalysisController(AnalysisService analysisService) {
-        this.analysisService = analysisService;
-    }
+    @Autowired
+    private AnalysisService analysisService;
 
     @GetMapping("/{id}/biggestfiles")
-    public ResponseEntity<?> getBiggestFiles(@PathVariable String id, @RequestParam int amount) {
+    public ResponseEntity<?> getBiggestFiles(@PathVariable long id, @RequestParam int amount) {
         List<Path> biggestFiles = analysisService.getBiggestFiles(id, amount);
 
-        if (biggestFiles == null || biggestFiles.isEmpty()) {
-            return new ResponseEntity<>("List is empty", HttpStatus.NO_CONTENT);
+        if (biggestFiles == null) {
+            return new ResponseEntity<>("Object doesn't exist", HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(biggestFiles);
     }
 
     @GetMapping("/{id}/duplicates")
-    public ResponseEntity<?> getDuplicates(@PathVariable String id) throws NoSuchAlgorithmException, IOException {
+    public ResponseEntity<?> getDuplicates(@PathVariable long id) throws NoSuchAlgorithmException, IOException {
         Set<Path> duplicates = analysisService.getDuplicates(id);
 
-        if (duplicates == null || duplicates.isEmpty()) {
-            return new ResponseEntity<>("List is empty", HttpStatus.NO_CONTENT);
+        if (duplicates == null) {
+            return new ResponseEntity<>("Object doesn't exist", HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(duplicates);
     }
 
     @GetMapping("/{id}/unknownfiles")
-    public ResponseEntity<?> getUnknownFiles(@PathVariable String id) throws NoSuchAlgorithmException, IOException {
+    public ResponseEntity<?> getUnknownFiles(@PathVariable long id) throws NoSuchAlgorithmException, IOException {
         Map<Path, String> unknownFiles = analysisService.getUnknownFiles(id);
 
-        if (unknownFiles == null || unknownFiles.isEmpty()) {
-            return new ResponseEntity<>("List is empty", HttpStatus.NO_CONTENT);
+        if (unknownFiles == null) {
+            return new ResponseEntity<>("Object doesn't exist", HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(unknownFiles);
