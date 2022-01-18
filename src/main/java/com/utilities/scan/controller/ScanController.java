@@ -2,6 +2,7 @@ package com.utilities.scan.controller;
 
 import com.utilities.domain.ScannedObject;
 import com.utilities.scan.service.ScanService;
+import com.utilities.validation.ValidationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,5 +68,11 @@ public class ScanController {
         }
 
         return ResponseEntity.ok(allFiles);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ValidationError handleException(Exception exception) {
+        return new ValidationError(exception.getMessage());
     }
 }
