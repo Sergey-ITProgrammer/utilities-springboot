@@ -1,9 +1,12 @@
 package com.utilities.scan.service;
 
+import com.utilities.domain.FilePath;
 import com.utilities.domain.ScannedObject;
+import com.utilities.repository.RepositoryOfFilesPath;
 import com.utilities.repository.RepositoryOfScannedObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -16,23 +19,43 @@ public class ScanService {
     private RepositoryOfScannedObject repositoryOfScannedObjects;
 
     @Autowired
+    private RepositoryOfFilesPath repositoryOfFilesPath;
+
+    @Autowired
     private ScavengerServiceImpl scavengerService;
 
     public void createScannedObject(ScannedObject object) {
-        scavengerService.cleanList();
+        ScannedObject scannedObject = repositoryOfScannedObjects.save(object);
 
-        repositoryOfScannedObjects.save(object);
+        List<FilePath> pathList = scavengerService.findAll(object.getPath()).stream().map(p -> {
+            FilePath filePath = new FilePath(p);
+            filePath.setObject(scannedObject);
+
+            return filePath;
+        }).toList();
+
+        repositoryOfFilesPath.saveAll(pathList);
     }
 
+    @Transactional
     public ScannedObject changeScannedObject(long id, String newPath) {
-        scavengerService.cleanList();
-
         Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
 
         if (scannedObject.isPresent()) {
             scannedObject.get().setPath(newPath);
 
-            repositoryOfScannedObjects.save(scannedObject.get());
+            ScannedObject newScannedObject = repositoryOfScannedObjects.save(scannedObject.get());
+
+            repositoryOfFilesPath.deleteByObjectId(id);
+
+            List<FilePath> pathList = scavengerService.findAll(newPath).stream().map(p -> {
+                FilePath filePath = new FilePath(p);
+                filePath.setObject(newScannedObject);
+
+                return filePath;
+            }).toList();
+
+            repositoryOfFilesPath.saveAll(pathList);
 
             return scannedObject.get();
         }
@@ -40,10 +63,14 @@ public class ScanService {
         return null;
     }
 
+    @Transactional
     public void deleteScannedObject(long id) {
         Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
 
-        scannedObject.ifPresent(repositoryOfScannedObjects::delete);
+        if (scannedObject.isPresent()) {
+            repositoryOfFilesPath.deleteByObjectId(id);
+            repositoryOfScannedObjects.deleteById(id);
+        }
     }
 
     public Iterable<ScannedObject> getAllScannedObjects() {
@@ -51,12 +78,6 @@ public class ScanService {
     }
 
     public List<Path> getAllFiles(long id) {
-        Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
-
-        if(scannedObject.isPresent()) {
-            return scavengerService.findAll(scannedObject.get().getPath());
-        }
-
-        return null;
+        return repositoryOfFilesPath.findByObjectId(id).stream().map(p -> Path.of(p.getPath())).toList();
     }
 }

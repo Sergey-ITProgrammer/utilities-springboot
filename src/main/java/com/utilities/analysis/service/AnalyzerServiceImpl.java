@@ -15,12 +15,10 @@ import java.util.*;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class AnalyzerServiceImpl implements AnalyzerService {
 
-    private List<Path> listOfBiggestFiles = new ArrayList<>();
-    private Set<Path> listOfDuplicates = new LinkedHashSet<>();
-    private Map<Path, String> listOfUnknownFiles = new LinkedHashMap<>();
-
     @Override
     public List<Path> getBiggestFiles(List<Path> files, int amountOfFiles) {
+        List<Path> listOfBiggestFiles = new ArrayList<>();
+
         if(files.isEmpty() || amountOfFiles > files.size()) return new ArrayList<>();
 
         List<File> ls = new ArrayList<>();
@@ -39,6 +37,8 @@ public class AnalyzerServiceImpl implements AnalyzerService {
 
     @Override
     public Set<Path> getDuplicates(List<Path> files) throws NoSuchAlgorithmException, IOException {
+        Set<Path> listOfDuplicates = new HashSet<>();
+
         byte[][] digest = new byte[files.size()][];
 
         for (int i = 0; i < files.size(); i++) {
@@ -61,6 +61,8 @@ public class AnalyzerServiceImpl implements AnalyzerService {
 
     @Override
     public Map<Path, String> getUnknownFiles(List<Path> files) throws NoSuchAlgorithmException, IOException {
+        Map<Path, String> listOfUnknownFiles = new HashMap<>();
+
         LinkedHashMap<String, String> listOfFileSignature = new LinkedHashMap<>();
 
         List<String> fileOfSignatures = getListOfSignatures();
@@ -379,17 +381,5 @@ public class AnalyzerServiceImpl implements AnalyzerService {
                 "21 2D 31 53 4C 4F 42 1F; slob";
 
         return Arrays.asList(list.split("\n"));
-    }
-
-    public void cleanListOfBiggestFiles() {
-        listOfBiggestFiles = new ArrayList<>();
-    }
-
-    public void cleanListOfDuplicates() {
-        listOfDuplicates = new LinkedHashSet<>();
-    }
-
-    public void cleanListOfUnknownFiles() {
-        listOfUnknownFiles = new LinkedHashMap<>();
     }
 }

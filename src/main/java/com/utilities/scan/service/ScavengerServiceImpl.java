@@ -12,10 +12,12 @@ import java.util.*;
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ScavengerServiceImpl implements ScavengerService {
 
-    private List<Path> list = new ArrayList<>();
+    private List<Path> list;
 
     @Override
     public List<Path> findAll(String path) {
+        list = new ArrayList<>();
+
         if (!list.isEmpty()) return list;
 
         File dir = new File(String.valueOf(path));
@@ -35,9 +37,5 @@ public class ScavengerServiceImpl implements ScavengerService {
                 }
             }
         }
-    }
-
-    public void cleanList() {
-        list = new ArrayList<>();
     }
 }

@@ -3,15 +3,12 @@ package com.utilities.domain;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class ScannedObject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
     private Long id;
 
     @Column(name = "path")
