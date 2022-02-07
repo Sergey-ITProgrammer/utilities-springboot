@@ -3,6 +3,7 @@ package com.utilities.domain;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class ScannedObject {
@@ -14,6 +15,10 @@ public class ScannedObject {
     @Column(name = "path")
     @NonNull
     private String path = "";
+
+    @ElementCollection
+    @Column(name = "FILE_PATH")
+    private List<String> allFilesList;
 
     public ScannedObject() {}
 
@@ -27,5 +32,13 @@ public class ScannedObject {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setAllFilesList(List<String> list) {
+        this.allFilesList = list;
+    }
+
+    public List<String> getAllFilesList() {
+        return allFilesList;
     }
 }

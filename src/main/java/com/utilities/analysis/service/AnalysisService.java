@@ -1,6 +1,7 @@
 package com.utilities.analysis.service;
 
-import com.utilities.repository.RepositoryOfFilesPath;
+import com.utilities.domain.ScannedObject;
+import com.utilities.repository.RepositoryOfScannedObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,25 +15,31 @@ import java.util.Set;
 @Service
 public class AnalysisService {
     @Autowired
-    private RepositoryOfFilesPath repositoryOfFilesPath;
+    private RepositoryOfScannedObject repositoryOfScannedObject;
 
     @Autowired
     private AnalyzerServiceImpl analyzerService;
 
     public List<Path> getBiggestFiles(long id, int amountOfFiles) {
-        List<Path> list = repositoryOfFilesPath.findByObjectId(id).stream().map(p -> Path.of(p.getPath())).toList();
+        ScannedObject scannedObject = repositoryOfScannedObject.getById(id);
+
+        List<Path> list = scannedObject.getAllFilesList().stream().map(Path::of).toList();
 
         return analyzerService.getBiggestFiles(list, amountOfFiles);
     }
 
     public Set<Path> getDuplicates(long id) throws NoSuchAlgorithmException, IOException {
-        List<Path> list = repositoryOfFilesPath.findByObjectId(id).stream().map(p -> Path.of(p.getPath())).toList();
+        ScannedObject scannedObject = repositoryOfScannedObject.getById(id);
+
+        List<Path> list = scannedObject.getAllFilesList().stream().map(Path::of).toList();
 
         return analyzerService.getDuplicates(list);
     }
 
     public Map<Path, String> getUnknownFiles(long id) throws NoSuchAlgorithmException, IOException {
-        List<Path> list = repositoryOfFilesPath.findByObjectId(id).stream().map(p -> Path.of(p.getPath())).toList();
+        ScannedObject scannedObject = repositoryOfScannedObject.getById(id);
+
+        List<Path> list = scannedObject.getAllFilesList().stream().map(Path::of).toList();
 
         return analyzerService.getUnknownFiles(list);
     }

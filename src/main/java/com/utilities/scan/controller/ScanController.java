@@ -61,7 +61,7 @@ public class ScanController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAllFiles(@PathVariable long id) {
-        List<Path> allFiles = scanService.getAllFiles(id);
+        List<String> allFiles = scanService.getAllFiles(id);
 
         if (allFiles == null) {
             return new ResponseEntity<>("Object doesn't exist", HttpStatus.BAD_REQUEST);
