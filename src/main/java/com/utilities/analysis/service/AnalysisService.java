@@ -23,7 +23,7 @@ public class AnalysisService {
     public List<Path> getBiggestFiles(long id, int amountOfFiles) {
         ScannedObject scannedObject = repositoryOfScannedObject.getById(id);
 
-        List<Path> list = scannedObject.getAllFilesList().stream().map(Path::of).toList();
+        List<Path> list = scannedObject.getAllFilesList().stream().map(p -> Path.of(p.getPath())).toList();
 
         return analyzerService.getBiggestFiles(list, amountOfFiles);
     }
@@ -31,7 +31,7 @@ public class AnalysisService {
     public Set<Path> getDuplicates(long id) throws NoSuchAlgorithmException, IOException {
         ScannedObject scannedObject = repositoryOfScannedObject.getById(id);
 
-        List<Path> list = scannedObject.getAllFilesList().stream().map(Path::of).toList();
+        List<Path> list = scannedObject.getAllFilesList().stream().map(p -> Path.of(p.getPath())).toList();
 
         return analyzerService.getDuplicates(list);
     }
@@ -39,7 +39,7 @@ public class AnalysisService {
     public Map<Path, String> getUnknownFiles(long id) throws NoSuchAlgorithmException, IOException {
         ScannedObject scannedObject = repositoryOfScannedObject.getById(id);
 
-        List<Path> list = scannedObject.getAllFilesList().stream().map(Path::of).toList();
+        List<Path> list = scannedObject.getAllFilesList().stream().map(p -> Path.of(p.getPath())).toList();
 
         return analyzerService.getUnknownFiles(list);
     }

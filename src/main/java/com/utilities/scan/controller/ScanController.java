@@ -1,5 +1,6 @@
 package com.utilities.scan.controller;
 
+import com.utilities.domain.FilePath;
 import com.utilities.domain.ScannedObject;
 import com.utilities.scan.service.ScanService;
 import com.utilities.validation.ValidationError;

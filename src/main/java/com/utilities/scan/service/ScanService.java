@@ -1,5 +1,6 @@
 package com.utilities.scan.service;
 
+import com.utilities.domain.FilePath;
 import com.utilities.domain.ScannedObject;
 import com.utilities.repository.RepositoryOfScannedObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,8 @@ public class ScanService {
     private ScavengerServiceImpl scavengerService;
 
     public void createScannedObject(ScannedObject object) {
-        List<String> list = scavengerService.findAll(object.getPath()).stream().map(Path::toString).toList();
+        List<FilePath> list = scavengerService.findAll(object.getPath()).stream()
+                .map(p -> new FilePath(p.toString(), object)).toList();
 
         object.setAllFilesList(list);
 
@@ -34,7 +36,8 @@ public class ScanService {
         if (scannedObject.isPresent()) {
             scannedObject.get().setPath(newPath);
 
-            List<String> list = scavengerService.findAll(newPath).stream().map(Path::toString).toList();
+            List<FilePath> list = scavengerService.findAll(newPath).stream()
+                    .map(p -> new FilePath(p.toString(), scannedObject.get())).toList();
 
             scannedObject.get().setAllFilesList(list);
 
@@ -55,13 +58,13 @@ public class ScanService {
         }
     }
 
-    public Iterable<ScannedObject> getAllScannedObjects() {
+    public List<ScannedObject> getAllScannedObjects() {
         return repositoryOfScannedObjects.findAll();
     }
 
     public List<String> getAllFiles(long id) {
         ScannedObject scannedObject = repositoryOfScannedObjects.getById(id);
 
-        return scannedObject.getAllFilesList();
+        return scannedObject.getAllFilesList().stream().map(FilePath::getPath).toList();
     }
 }

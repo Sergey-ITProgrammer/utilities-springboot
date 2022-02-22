@@ -18,8 +18,6 @@ public class ScavengerServiceImpl implements ScavengerService {
     public List<Path> findAll(String path) {
         list = new ArrayList<>();
 
-        if (!list.isEmpty()) return list;
-
         File dir = new File(String.valueOf(path));
 
         searchFiles(dir);

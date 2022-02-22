@@ -1,24 +1,27 @@
 package com.utilities.domain;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 public class ScannedObject {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
 
-    @Column(name = "path")
     @NonNull
     private String path = "";
 
-    @ElementCollection
-    @Column(name = "FILE_PATH")
-    private List<String> allFilesList;
+    @OneToMany(mappedBy = "scannedObject", cascade = {CascadeType.PERSIST})
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Collection<FilePath> allFilesList = new ArrayList<>();
 
     public ScannedObject() {}
 
@@ -34,11 +37,11 @@ public class ScannedObject {
         this.path = path;
     }
 
-    public void setAllFilesList(List<String> list) {
+    public void setAllFilesList(List<FilePath> list) {
         this.allFilesList = list;
     }
 
-    public List<String> getAllFilesList() {
+    public Collection<FilePath> getAllFilesList() {
         return allFilesList;
     }
 }
