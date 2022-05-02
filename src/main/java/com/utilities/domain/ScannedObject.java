@@ -10,12 +10,10 @@ import org.springframework.lang.NonNull;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @NoArgsConstructor
 @Entity
 public class ScannedObject {
-
     @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)

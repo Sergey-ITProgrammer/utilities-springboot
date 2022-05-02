@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +19,7 @@ public class AnalysisController {
     @Autowired
     private AnalysisService analysisService;
 
-    @GetMapping("/{id}/biggestfiles")
+    @GetMapping("/{id}/biggest")
     public ResponseEntity<?> getBiggestFiles(@PathVariable long id, @RequestParam int amount) {
         List<Path> biggestFiles = analysisService.getBiggestFiles(id, amount);
 
@@ -33,7 +31,7 @@ public class AnalysisController {
     }
 
     @GetMapping("/{id}/duplicates")
-    public ResponseEntity<?> getDuplicates(@PathVariable long id) throws NoSuchAlgorithmException, IOException {
+    public ResponseEntity<?> getDuplicates(@PathVariable long id) {
         Set<Path> duplicates = analysisService.getDuplicates(id);
 
         if (duplicates == null) {
@@ -43,8 +41,8 @@ public class AnalysisController {
         return ResponseEntity.ok(duplicates);
     }
 
-    @GetMapping("/{id}/unknownfiles")
-    public ResponseEntity<?> getUnknownFiles(@PathVariable long id) throws NoSuchAlgorithmException, IOException {
+    @GetMapping("/{id}/unknown")
+    public ResponseEntity<?> getUnknownFiles(@PathVariable long id) {
         Map<Path, String> unknownFiles = analysisService.getUnknownFiles(id);
 
         if (unknownFiles == null) {

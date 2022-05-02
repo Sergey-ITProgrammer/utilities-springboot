@@ -36,15 +36,20 @@ public class AnalyzerServiceImpl implements AnalyzerService {
     }
 
     @Override
-    public Set<Path> getDuplicates(List<Path> files) throws NoSuchAlgorithmException, IOException {
+    public Set<Path> getDuplicates(List<Path> files) {
         Set<Path> listOfDuplicates = new HashSet<>();
 
         byte[][] digest = new byte[files.size()][];
 
-        for (int i = 0; i < files.size(); i++) {
-            MessageDigest md = MessageDigest.getInstance("md5");
-            md.update(Files.readAllBytes(files.get(i)));
-            digest[i] = md.digest();
+        try {
+            for (int i = 0; i < files.size(); i++) {
+                MessageDigest md = null;
+                md = MessageDigest.getInstance("md5");
+                md.update(Files.readAllBytes(files.get(i)));
+                digest[i] = md.digest();
+            }
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
 
         for (int i = 0; i < digest.length; i++) {
@@ -60,7 +65,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
     }
 
     @Override
-    public Map<Path, String> getUnknownFiles(List<Path> files) throws NoSuchAlgorithmException, IOException {
+    public Map<Path, String> getUnknownFiles(List<Path> files) {
         Map<Path, String> listOfUnknownFiles = new HashMap<>();
 
         LinkedHashMap<String, String> listOfFileSignature = new LinkedHashMap<>();
@@ -81,6 +86,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
             listOfFileSignature.put(signature.toString(), extension);
         }
 
+
         for (int i = 0; i < files.size(); i++) {
             String fileExtension = getFileExtension(files.get(i));
 
@@ -89,6 +95,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
                 listOfUnknownFiles.put(files.get(i), extension);
             }
         }
+
 
         return listOfUnknownFiles;
     }
@@ -107,10 +114,16 @@ public class AnalyzerServiceImpl implements AnalyzerService {
         return fileExtension;
     }
 
-    private String getUnknownFileExtension(Path filePath, LinkedHashMap<String, String> listOfFileSignature, int fileSize) throws NoSuchAlgorithmException, IOException {
+    private String getUnknownFileExtension(Path filePath, LinkedHashMap<String, String> listOfFileSignature, int fileSize) {
         String signature = "";
 
-        byte[] arrayOfBytesOfFile = Files.readAllBytes(filePath);
+        byte[] arrayOfBytesOfFile;
+        try {
+            arrayOfBytesOfFile = Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         StringBuilder bytesOfF = new StringBuilder();
 
         for (byte j : arrayOfBytesOfFile) {

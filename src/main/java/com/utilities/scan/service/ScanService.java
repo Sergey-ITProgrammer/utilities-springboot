@@ -7,18 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ScanService {
 
-    @Autowired
-    private RepositoryOfScannedObject repositoryOfScannedObjects;
+    private final RepositoryOfScannedObject repositoryOfScannedObjects;
+
+    private final ScavengerServiceImpl scavengerService;
 
     @Autowired
-    private ScavengerServiceImpl scavengerService;
+    public ScanService(RepositoryOfScannedObject repositoryOfScannedObjects, ScavengerServiceImpl scavengerService) {
+        this.repositoryOfScannedObjects = repositoryOfScannedObjects;
+        this.scavengerService = scavengerService;
+    }
 
     public void createScannedObject(ScannedObject object) {
         List<FilePath> list = scavengerService.findAll(object.getPath()).stream()
@@ -49,15 +52,6 @@ public class ScanService {
         return null;
     }
 
-    @Transactional
-    public void deleteScannedObject(long id) {
-        Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
-
-        if (scannedObject.isPresent()) {
-            repositoryOfScannedObjects.deleteById(id);
-        }
-    }
-
     public List<ScannedObject> getAllScannedObjects() {
         return repositoryOfScannedObjects.findAll();
     }
@@ -66,5 +60,14 @@ public class ScanService {
         ScannedObject scannedObject = repositoryOfScannedObjects.getById(id);
 
         return scannedObject.getAllFilesList().stream().map(FilePath::getPath).toList();
+    }
+
+    @Transactional
+    public void deleteScannedObject(long id) {
+        Optional<ScannedObject> scannedObject = repositoryOfScannedObjects.findById(id);
+
+        if (scannedObject.isPresent()) {
+            repositoryOfScannedObjects.deleteById(id);
+        }
     }
 }
